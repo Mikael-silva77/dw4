@@ -1,16 +1,25 @@
 import { produtos } from '$lib/server/03/produtos.js';
 
 export function load({ params, url }) {
-  const categoria = params.categoria.toLowerCase();
-  const busca = url.searchParams.get('busca')?.toLowerCase() ?? '';
+  let busca = url.searchParams.get('busca');
+  if(!busca) busca ='';
+  else busca = busca.toLowerCase();
 
-  const filtrados = produtos.filter(p =>
-    p.categorias.map(c => c.toLowerCase()).includes(categoria) &&
-    (
-      p.titulo.toLowerCase().includes(busca) ||
-      p.descricao.toLowerCase().includes(busca)
+  let produtosFiltrados = [];
+  for (const produto of produtos) {
+    if(
+      produto.categorias.includes(params.categoria)&&
+      (
+        busca == ' '  ||
+        produto.titulo.toLowerCase().includes(busca) ||
+        produto.descricao.toLowerCase().includes(busca)
+      )
     )
-  );
 
-  return { produtos: filtrados, categoria, busca };
+    produtosFiltrados.push(produto);
+  
+  
+  }
+
+  return { produtosFiltrados, categoria: params.categoria};
 }
